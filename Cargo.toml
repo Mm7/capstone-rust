@@ -2,10 +2,13 @@
 name = "capstone_rust"
 version = "0.1.0"
 authors = ["Marco Milanese <marcomilanese7@gmail.com>"]
+build = "build.rs"
 
 [lib]
 name = "capstone_rust"
 
 [dependencies]
 libc = "0.2"
-libcapstone-sys = "0.3.0"
+
+[build-dependencies]
+bindgen = "0.20.0"

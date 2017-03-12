@@ -1,7 +1,6 @@
 extern crate libc;
-extern crate libcapstone_sys;
 
-pub use self::libcapstone_sys::*;
+pub use capstone_sys::*;
 
 use std::cell::Cell;
 use std::error::Error;
@@ -41,11 +40,10 @@ pub fn engine_version() -> (i32, i32, u32) {
 /// ```
 /// use capstone_rust::capstone as cs;
 ///
-/// let supported = if cs::support_arch(cs::CS_ARCH_ARM) { "is" } else { "isn't" };
+/// let supported = if cs::support_arch(cs::cs_arch::CS_ARCH_ARM) { "is" } else { "isn't" };
 /// println!("The ARM architecture {} supported!", supported);
 /// ```
 pub fn support_arch(arch: cs_arch) -> bool {
-    assert!(arch <= i32::max_value() as u32);
     unsafe { cs_support(arch as i32) }
 }
 
@@ -77,7 +75,7 @@ impl Error for CsErr {
 impl CsErr {
     /// Create a Capstone error from a low-level cs_err code.
     pub fn new(code: cs_err) -> CsErr {
-        assert_ne!(code, CS_ERR_OK);
+        assert_ne!(code, cs_err::CS_ERR_OK);
         CsErr{code: code}
     }
 
@@ -89,7 +87,7 @@ impl CsErr {
 
 /// Convert a cs_err to a Result<(), CsErr>.
 fn to_res(code: cs_err) -> Result<(), CsErr> {
-    if code != CS_ERR_OK {
+    if code != cs_err::CS_ERR_OK {
         Err(CsErr::new(code))
     } else {
         Ok(())
@@ -230,7 +228,7 @@ impl Drop for Capstone {
 
         unsafe { err = cs_close(self.handle.as_ptr()); }
 
-        if err != CS_ERR_OK {
+        if err != cs_err::CS_ERR_OK {
             panic!("{}", CsErr::new(err).description())
         }
     }
@@ -275,7 +273,7 @@ impl Capstone {
     /// use capstone_rust::capstone as cs;
     /// let code = vec![0x55, 0x48, 0x8b, 0x05, 0xb8, 0x13, 0x00, 0x00];
     ///
-    /// let dec = cs::Capstone::new(cs::CS_ARCH_X86, cs::CS_MODE_32).unwrap();
+    /// let dec = cs::Capstone::new(cs::cs_arch::CS_ARCH_X86, cs::cs_mode::CS_MODE_32).unwrap();
     /// let buf = dec.disasm(code, 0, 0).unwrap();
     /// for x in buf.iter() {
     ///     println!("{:x}: {} {}", x.address, x.mnemonic, x.op_str);
@@ -285,7 +283,7 @@ impl Capstone {
     /// use capstone_rust::capstone as cs;
     /// let code = vec![0x55, 0x48, 0x8b, 0x05, 0xb8, 0x13, 0x00, 0x00];
     ///
-    /// let dec = cs::Capstone::new(cs::CS_ARCH_X86, cs::CS_MODE_32).unwrap();
+    /// let dec = cs::Capstone::new(cs::cs_arch::CS_ARCH_X86, cs::cs_mode::CS_MODE_32).unwrap();
     /// let buf = dec.disasm(code, 0, 0).unwrap();
     /// assert_eq!(buf.get(0).mnemonic, "push");
     /// assert_eq!(buf.get(1).mnemonic, "dec");
@@ -316,7 +314,7 @@ impl Capstone {
     /// ```
     /// use capstone_rust::capstone as cs;
     ///
-    /// let dec = cs::Capstone::new(cs::CS_ARCH_X86, cs::CS_MODE_32).unwrap();
+    /// let dec = cs::Capstone::new(cs::cs_arch::CS_ARCH_X86, cs::cs_mode::CS_MODE_32).unwrap();
     /// assert_eq!(dec.reg_name(21).unwrap(), "ebx");
     /// ```
     pub fn reg_name(&self, reg_id: u32) -> Option<&str> {
