@@ -1,0 +1,11 @@
+[package]
+name = "capstone_rust"
+version = "0.1.0"
+authors = ["Marco Milanese <marcomilanese7@gmail.com>"]
+
+[lib]
+name = "capstone_rust"
+
+[dependencies]
+libc = "0.2"
+libcapstone-sys = "0.3.0"
