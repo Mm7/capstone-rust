@@ -1,5 +1,10 @@
 dist: trusty
 sudo: required
+env:
+  - LLVM_CONFIG_PATH=/usr/lib/llvm-3.9/bin/llvm-config
+  - LIBCLANG_PATH=/usr/lib/x86_64-linux-gnu/
+  - LIBCLANG_STATIC_PATH=/usr/lib/llvm-3.9/lib/
+  - CLANG_PATH=/usr/bin/clang-3.9
 before_install:
   - wget -O - http://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
   - sudo apt-add-repository "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.9 main"
