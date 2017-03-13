@@ -8,7 +8,7 @@ use std::fmt;
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
 // It seems that bindgen fails to derive Debug, Clone and Copy for `cs_arm`. Let's implement them
-// traits manually.
+// manually.
 impl fmt::Debug for cs_arm {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut operands = String::new();
