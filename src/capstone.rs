@@ -6,7 +6,7 @@ use std::cell::Cell;
 use std::error::Error;
 use std::ffi::CStr;
 use std::fmt;
-use std::mem;
+use std::mem::transmute;
 
 /// Get the version of the capstone engine.
 ///
@@ -103,7 +103,7 @@ fn to_res(code: cs_err) -> Result<(), CsErr> {
 pub struct Instr {
     /// Instruction ID. Find the instruction id in the '[ARCH]_insn' enum in the header file of
     /// corresponding architecture.
-    pub id: u32,
+    pub id: InstrIdArch,
 
     /// Address (EIP) of this instruction.
     pub address: u64,
@@ -129,6 +129,18 @@ impl Instr {
     pub fn new(instr: &cs_insn, decode_detail: bool, arch: cs_arch) -> Instr {
         assert_ne!(arch, cs_arch::CS_ARCH_MAX);
         assert_ne!(arch, cs_arch::CS_ARCH_ALL);
+
+        let id = unsafe { match arch {
+            cs_arch::CS_ARCH_ARM   => { InstrIdArch::ARM  (transmute::<u32,arm_insn>(instr.id))},
+            cs_arch::CS_ARCH_ARM64 => { InstrIdArch::ARM64(transmute::<u32,arm64_insn>(instr.id))},
+            cs_arch::CS_ARCH_MIPS  => { InstrIdArch::MIPS (transmute::<u32,mips_insn>(instr.id))},
+            cs_arch::CS_ARCH_X86   => { InstrIdArch::X86  (transmute::<u32,x86_insn>(instr.id))},
+            cs_arch::CS_ARCH_PPC   => { InstrIdArch::PPC  (transmute::<u32,ppc_insn>(instr.id))},
+            cs_arch::CS_ARCH_SPARC => { InstrIdArch::SPARC(transmute::<u32,sparc_insn>(instr.id))},
+            cs_arch::CS_ARCH_SYSZ  => { InstrIdArch::SYSZ (transmute::<u32,sysz_insn>(instr.id))},
+            cs_arch::CS_ARCH_XCORE => { InstrIdArch::XCORE(transmute::<u32,xcore_insn>(instr.id))},
+            _ => panic!("Unexpected arch: {:?}", arch),
+        }};
 
         let mut bytes = Vec::new();
         for i in 0..instr.bytes.len() {
@@ -193,7 +205,7 @@ impl Instr {
         };
 
         Instr {
-            id: instr.id,
+            id: id,
             address: instr.address,
             size: instr.size,
             bytes: bytes,
@@ -202,6 +214,34 @@ impl Instr {
             detail: detail
         }
     }
+}
+
+/// Architecture-specific instruction id.
+///
+/// # Examples
+///
+/// ```
+/// use capstone_rust::capstone as cs;
+/// let code = vec![0x01, 0xc3]; // add ebx, eax
+///
+/// let dec = cs::Capstone::new(cs::cs_arch::CS_ARCH_X86, cs::cs_mode::CS_MODE_32).unwrap();
+///
+/// let buf = dec.disasm(code, 0, 0).unwrap();
+/// let add = buf.get(0);
+/// if let cs::InstrIdArch::X86(insn) = add.id {
+///     assert_eq!(insn, cs::x86_insn::X86_INS_ADD);
+/// }
+/// ```
+#[derive(Debug, PartialEq)]
+pub enum InstrIdArch {
+    X86(x86_insn),
+    ARM64(arm64_insn),
+    ARM(arm_insn),
+    MIPS(mips_insn),
+    PPC(ppc_insn),
+    SPARC(sparc_insn),
+    SYSZ(sysz_insn),
+    XCORE(xcore_insn),
 }
 
 /// Details of an instruction.
@@ -366,7 +406,7 @@ impl Capstone {
         let err;
 
         unsafe {
-            let value = mem::transmute::<cs_opt_value, u32>(value) as usize;
+            let value = transmute::<cs_opt_value, u32>(value) as usize;
             err = cs_option(self.handle.get(), typ, value);
         };
         to_res(err)?;
