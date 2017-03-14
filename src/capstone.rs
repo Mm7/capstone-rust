@@ -101,12 +101,26 @@ fn to_res(code: cs_err) -> Result<(), CsErr> {
 /// over cs_insn.
 #[derive(Debug)]
 pub struct Instr {
+    /// Instruction ID. Find the instruction id in the '[ARCH]_insn' enum in the header file of
+    /// corresponding architecture.
     pub id: u32,
+
+    /// Address (EIP) of this instruction.
     pub address: u64,
+
+    /// Size of this instruction.
     pub size: u16,
+
+    /// Machine bytes of this instruction.
     pub bytes: Vec<u8>,
+
+    /// Ascii text of instruction mnemonic.
     pub mnemonic: String,
+
+    /// Ascii text of instruction operands.
     pub op_str: String,
+
+    /// Detail of this instuction.
     pub detail: Option<Details>,
 }
 
@@ -199,25 +213,24 @@ impl Instr {
 ///
 /// ```
 /// use capstone_rust::capstone as cs;
-/// let code = vec![0x55, 0x48, 0x8b, 0x05, 0xb8, 0x13, 0x00, 0x00];
+/// let code = vec![0x01, 0xc3]; // add ebx, eax
 ///
 /// let dec = cs::Capstone::new(cs::cs_arch::CS_ARCH_X86, cs::cs_mode::CS_MODE_32).unwrap();
-/// dec.option(cs::cs_opt_type::CS_OPT_DETAIL, cs::cs_opt_value::CS_OPT_ON);
+/// dec.option(cs::cs_opt_type::CS_OPT_DETAIL, cs::cs_opt_value::CS_OPT_ON).unwrap();
 ///
 /// let buf = dec.disasm(code, 0, 0).unwrap();
-/// for x in buf.iter() {
-///     println!("{:x}: {} {}", x.address, x.mnemonic, x.op_str);
-/// }
+/// let detail = buf.get(0).detail.unwrap(); // `buf` contains only one 'add'.
+/// assert_eq!(dec.reg_name(detail.regs_write[0]), Some("eflags"));
 /// ```
 #[derive(Debug)]
 pub struct Details {
-    /// List of implicit registers read by this insn
+    /// List of implicit registers read by this insn.
     pub regs_read: Vec<u8>,
 
-    /// List of implicit registers modified by this insn
+    /// List of implicit registers modified by this insn.
     pub regs_write: Vec<u8>,
 
-    /// List of group this instruction belong to
+    /// List of group this instruction belong to.
     pub groups: Vec<u8>,
 
     /// Architecture-specific details.
@@ -433,9 +446,9 @@ impl Capstone {
     /// let dec = cs::Capstone::new(cs::cs_arch::CS_ARCH_X86, cs::cs_mode::CS_MODE_32).unwrap();
     /// assert_eq!(dec.reg_name(21).unwrap(), "ebx");
     /// ```
-    pub fn reg_name(&self, reg_id: u32) -> Option<&str> {
+    pub fn reg_name(&self, reg_id: u8) -> Option<&str> {
         let name = unsafe {
-            let name = cs_reg_name(self.handle.get(), reg_id);
+            let name = cs_reg_name(self.handle.get(), reg_id as u32);
             if name == 0 as *const i8 {
                 return None;
             }
@@ -461,9 +474,9 @@ impl Capstone {
     /// let dec = cs::Capstone::new(cs::cs_arch::CS_ARCH_X86, cs::cs_mode::CS_MODE_32).unwrap();
     /// assert_eq!(dec.group_name(2).unwrap(), "call");
     /// ```
-    pub fn group_name(&self, group_id: u32) -> Option<&str> {
+    pub fn group_name(&self, group_id: u8) -> Option<&str> {
         let name = unsafe {
-            let name = cs_group_name(self.handle.get(), group_id);
+            let name = cs_group_name(self.handle.get(), group_id as u32);
             if name == 0 as *const i8 {
                 return None;
             }
