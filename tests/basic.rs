@@ -3,7 +3,7 @@ extern crate capstone_rust;
 use capstone_rust::capstone as cs;
 
 #[test]
-fn signle_instr() {
+fn single_instr() {
     let code = vec![0xe9, 0x0c, 0x00, 0x00, 0x00];
     let dec = cs::Capstone::new(cs::cs_arch::CS_ARCH_X86, cs::cs_mode::CS_MODE_32).unwrap();
 
