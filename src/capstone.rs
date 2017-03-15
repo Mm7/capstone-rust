@@ -181,12 +181,12 @@ impl Instr {
 
             let mut regs_read = Vec::new();
             for i in 0..detail.regs_read_count {
-                regs_read.push(detail.regs_read[i as usize]);
+                regs_read.push(detail.regs_read[i as usize] as u32);
             }
 
             let mut regs_write = Vec::new();
             for i in 0..detail.regs_write_count {
-                regs_write.push(detail.regs_write[i as usize]);
+                regs_write.push(detail.regs_write[i as usize] as u32);
             }
 
             let mut groups = Vec::new();
@@ -265,10 +265,10 @@ pub enum InstrIdArch {
 #[derive(Debug)]
 pub struct Details {
     /// List of implicit registers read by this insn.
-    pub regs_read: Vec<u8>,
+    pub regs_read: Vec<u32>,
 
     /// List of implicit registers modified by this insn.
-    pub regs_write: Vec<u8>,
+    pub regs_write: Vec<u32>,
 
     /// List of group this instruction belong to.
     pub groups: Vec<u8>,
@@ -486,9 +486,9 @@ impl Capstone {
     /// let dec = cs::Capstone::new(cs::cs_arch::CS_ARCH_X86, cs::cs_mode::CS_MODE_32).unwrap();
     /// assert_eq!(dec.reg_name(21).unwrap(), "ebx");
     /// ```
-    pub fn reg_name(&self, reg_id: u8) -> Option<&str> {
+    pub fn reg_name(&self, reg_id: u32) -> Option<&str> {
         let name = unsafe {
-            let name = cs_reg_name(self.handle.get(), reg_id as u32);
+            let name = cs_reg_name(self.handle.get(), reg_id);
             if name == 0 as *const i8 {
                 return None;
             }
