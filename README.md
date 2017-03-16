@@ -20,4 +20,4 @@ Append to Cargo.toml:
 capstone_rust = "0.1.0"
 ```
 
-Copy & paste an [example](https://github.com/Mm7/capstone-rust/examples).
+Copy & paste an [example](https://github.com/Mm7/capstone-rust/tree/master/examples).
