@@ -191,7 +191,7 @@ impl Instr {
 
             let mut groups = Vec::new();
             for i in 0..detail.groups_count {
-                groups.push(detail.groups[i as usize]);
+                groups.push(detail.groups[i as usize] as u32);
             }
 
             Some(Details {
@@ -271,7 +271,7 @@ pub struct Details {
     pub regs_write: Vec<u32>,
 
     /// List of group this instruction belong to.
-    pub groups: Vec<u8>,
+    pub groups: Vec<u32>,
 
     /// Architecture-specific details.
     pub arch: DetailsArch,
