@@ -247,3 +247,92 @@ impl xcore_reg {
         return unsafe { transmute::<Self, u32>(*self) }
     }
 }
+
+// Groups: enum <-> integer.
+impl From<u32> for x86_insn_group {
+    fn from(i: u32) -> Self {
+        return unsafe { transmute::<u32, Self>(i) }
+    }
+}
+impl x86_insn_group {
+    pub fn as_int(&self) -> u32 {
+        return unsafe { transmute::<Self, u32>(*self) }
+    }
+}
+
+impl From<u32> for arm64_insn_group {
+    fn from(i: u32) -> Self {
+        return unsafe { transmute::<u32, Self>(i) }
+    }
+}
+impl arm64_insn_group {
+    pub fn as_int(&self) -> u32 {
+        return unsafe { transmute::<Self, u32>(*self) }
+    }
+}
+
+impl From<u32> for arm_insn_group {
+    fn from(i: u32) -> Self {
+        return unsafe { transmute::<u32, Self>(i) }
+    }
+}
+impl arm_insn_group {
+    pub fn as_int(&self) -> u32 {
+        return unsafe { transmute::<Self, u32>(*self) }
+    }
+}
+
+impl From<u32> for mips_insn_group {
+    fn from(i: u32) -> Self {
+        return unsafe { transmute::<u32, Self>(i) }
+    }
+}
+impl mips_insn_group {
+    pub fn as_int(&self) -> u32 {
+        return unsafe { transmute::<Self, u32>(*self) }
+    }
+}
+
+impl From<u32> for ppc_insn_group {
+    fn from(i: u32) -> Self {
+        return unsafe { transmute::<u32, Self>(i) }
+    }
+}
+impl ppc_insn_group {
+    pub fn as_int(&self) -> u32 {
+        return unsafe { transmute::<Self, u32>(*self) }
+    }
+}
+
+impl From<u32> for sparc_insn_group {
+    fn from(i: u32) -> Self {
+        return unsafe { transmute::<u32, Self>(i) }
+    }
+}
+impl sparc_insn_group {
+    pub fn as_int(&self) -> u32 {
+        return unsafe { transmute::<Self, u32>(*self) }
+    }
+}
+
+impl From<u32> for sysz_insn_group {
+    fn from(i: u32) -> Self {
+        return unsafe { transmute::<u32, Self>(i) }
+    }
+}
+impl sysz_insn_group {
+    pub fn as_int(&self) -> u32 {
+        return unsafe { transmute::<Self, u32>(*self) }
+    }
+}
+
+impl From<u32> for xcore_insn_group {
+    fn from(i: u32) -> Self {
+        return unsafe { transmute::<u32, Self>(i) }
+    }
+}
+impl xcore_insn_group {
+    pub fn as_int(&self) -> u32 {
+        return unsafe { transmute::<Self, u32>(*self) }
+    }
+}

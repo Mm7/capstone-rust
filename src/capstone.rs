@@ -514,9 +514,9 @@ impl Capstone {
     /// let dec = cs::Capstone::new(cs::cs_arch::CS_ARCH_X86, cs::cs_mode::CS_MODE_32).unwrap();
     /// assert_eq!(dec.group_name(2).unwrap(), "call");
     /// ```
-    pub fn group_name(&self, group_id: u8) -> Option<&str> {
+    pub fn group_name(&self, group_id: u32) -> Option<&str> {
         let name = unsafe {
-            let name = cs_group_name(self.handle.get(), group_id as u32);
+            let name = cs_group_name(self.handle.get(), group_id);
             if name == 0 as *const i8 {
                 return None;
             }
