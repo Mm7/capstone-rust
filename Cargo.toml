@@ -1,18 +1,14 @@
 [package]
 name = "capstone_rust"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Marco Milanese <marcomilanese7@gmail.com>"]
 homepage = "https://github.com/Mm7/capstone-rust"
 repository = "https://github.com/Mm7/capstone-rust"
 description = "A Capstone engine binding for Rust"
 keywords = ["capstone","disassembly"]
-categories = ["api-bindings"]
 readme = "README.md"
 license = "LGPL-3.0"
 build = "build.rs"
-
-[badges]
-travis-ci = { repository = "Mm7/capstone-rust", branch = "master" }
 
 [lib]
 name = "capstone_rust"
