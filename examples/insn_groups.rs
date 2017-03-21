@@ -12,7 +12,7 @@ fn main() {
     // Enable detail mode. This is needed if you want to get instruction details.
     dec.option(cs::cs_opt_type::CS_OPT_DETAIL, cs::cs_opt_value::CS_OPT_ON).unwrap();
 
-    let buf = dec.disasm(code, 0x100, 0).unwrap();
+    let buf = dec.disasm(code.as_slice(), 0x100, 0).unwrap();
 
     for instr in buf.iter() {
         println!("0x{:x}:\t{}\t{}", instr.address, instr.mnemonic, instr.op_str);

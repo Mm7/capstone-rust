@@ -7,7 +7,7 @@ fn single_instr() {
     let code = vec![0xe9, 0x0c, 0x00, 0x00, 0x00];
     let dec = cs::Capstone::new(cs::cs_arch::CS_ARCH_X86, cs::cs_mode::CS_MODE_32).unwrap();
 
-    let buf = dec.disasm(code, 0, 0).unwrap();
+    let buf = dec.disasm(code.as_slice(), 0, 0).unwrap();
 
     let jmp = buf.get(0);
     assert_eq!(jmp.mnemonic, "jmp");
@@ -24,7 +24,7 @@ fn multiple_instr() {
 
     dec.option(cs::cs_opt_type::CS_OPT_DETAIL, cs::cs_opt_value::CS_OPT_ON).unwrap();
 
-    let buf = dec.disasm(code, 0, 0).unwrap();
+    let buf = dec.disasm(code.as_slice(), 0, 0).unwrap();
 
     let instr1 = buf.get(0);
     assert_eq!(instr1.mnemonic, "add");

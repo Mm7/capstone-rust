@@ -8,7 +8,7 @@ fn implicit() {
     let dec = cs::Capstone::new(cs::cs_arch::CS_ARCH_X86, cs::cs_mode::CS_MODE_32).unwrap();
     dec.option(cs::cs_opt_type::CS_OPT_DETAIL, cs::cs_opt_value::CS_OPT_ON).unwrap();
 
-    let buf = dec.disasm(code, 0, 0).unwrap();
+    let buf = dec.disasm(code.as_slice(), 0, 0).unwrap();
 
     let detail = buf.get(0).detail.unwrap();
     assert_eq!(dec.reg_name(detail.regs_write[0]), Some("eflags"));
@@ -23,7 +23,7 @@ fn operands() {
     let dec = cs::Capstone::new(cs::cs_arch::CS_ARCH_X86, cs::cs_mode::CS_MODE_32).unwrap();
     dec.option(cs::cs_opt_type::CS_OPT_DETAIL, cs::cs_opt_value::CS_OPT_ON).unwrap();
 
-    let buf = dec.disasm(code, 0, 0).unwrap();
+    let buf = dec.disasm(code.as_slice(), 0, 0).unwrap();
     let detail = buf.get(0).detail.unwrap();
     if let cs::DetailsArch::X86(arch) = detail.arch {
         let op1 = arch.operands[0];

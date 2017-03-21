@@ -19,7 +19,7 @@ fn main() {
     // buffer (a Vec<u8>), the address of the first instruction and the number of
     // instructions to decode (if zero, Capstone continues until the buffer is exhausted
     // or invalid data is found).
-    let buf = dec.disasm(code, 0x100, 0).unwrap();
+    let buf = dec.disasm(code.as_slice(), 0x100, 0).unwrap();
 
     // Iterate over the disassembled instructions and print them.
     for instr in buf.iter() {
