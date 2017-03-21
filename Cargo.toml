@@ -1,6 +1,6 @@
 [package]
 name = "capstone_rust"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Marco Milanese <marcomilanese7@gmail.com>"]
 homepage = "https://github.com/Mm7/capstone-rust"
 repository = "https://github.com/Mm7/capstone-rust"
