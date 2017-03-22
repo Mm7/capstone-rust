@@ -9,7 +9,7 @@ fn single_instr() {
 
     let buf = dec.disasm(code.as_slice(), 0, 0).unwrap();
 
-    let jmp = buf.get(0);
+    let jmp = buf.get(0).unwrap();
     assert_eq!(jmp.mnemonic, "jmp");
     assert_eq!(jmp.op_str, "0x11");
     assert_eq!(jmp.address, 0);
@@ -26,28 +26,28 @@ fn multiple_instr() {
 
     let buf = dec.disasm(code.as_slice(), 0, 0).unwrap();
 
-    let instr1 = buf.get(0);
+    let instr1 = buf.get(0).unwrap();
     assert_eq!(instr1.mnemonic, "add");
     assert_eq!(instr1.op_str, "ebx, 2");
     assert_eq!(instr1.address, 0);
     assert_eq!(instr1.id, cs::InstrIdArch::X86(cs::x86_insn::X86_INS_ADD));
     assert_eq!(instr1.size, 3);
 
-    let instr2 = buf.get(1);
+    let instr2 = buf.get(1).unwrap();
     assert_eq!(instr2.mnemonic, "mov");
     assert_eq!(instr2.op_str, "ax, 0x2c");
     assert_eq!(instr2.address, 3);
     assert_eq!(instr2.id, cs::InstrIdArch::X86(cs::x86_insn::X86_INS_MOV));
     assert_eq!(instr2.size, 4);
 
-    let instr3 = buf.get(2);
+    let instr3 = buf.get(2).unwrap();
     assert_eq!(instr3.mnemonic, "push");
     assert_eq!(instr3.op_str, "ebp");
     assert_eq!(instr3.address, 7);
     assert_eq!(instr3.id, cs::InstrIdArch::X86(cs::x86_insn::X86_INS_PUSH));
     assert_eq!(instr3.size, 1);
 
-    let instr4 = buf.get(3);
+    let instr4 = buf.get(3).unwrap();
     assert_eq!(instr4.mnemonic, "lea");
     assert_eq!(instr4.op_str, "esi, dword ptr [ebx + 0x10]");
     assert_eq!(instr4.address, 8);

@@ -10,10 +10,10 @@ fn implicit() {
 
     let buf = dec.disasm(code.as_slice(), 0, 0).unwrap();
 
-    let detail = buf.get(0).detail.unwrap();
+    let detail = buf.get(0).unwrap().detail.unwrap();
     assert_eq!(dec.reg_name(detail.regs_write[0]), Some("eflags"));
 
-    let detail = buf.get(1).detail.unwrap();
+    let detail = buf.get(1).unwrap().detail.unwrap();
     assert_eq!(dec.reg_name(detail.regs_read[0]), Some("esp"));
 }
 
@@ -24,7 +24,7 @@ fn operands() {
     dec.option(cs::cs_opt_type::CS_OPT_DETAIL, cs::cs_opt_value::CS_OPT_ON).unwrap();
 
     let buf = dec.disasm(code.as_slice(), 0, 0).unwrap();
-    let detail = buf.get(0).detail.unwrap();
+    let detail = buf.get(0).unwrap().detail.unwrap();
     if let cs::DetailsArch::X86(arch) = detail.arch {
         let op1 = arch.operands[0];
         assert_eq!(op1.type_, cs::x86_op_type::X86_OP_REG);

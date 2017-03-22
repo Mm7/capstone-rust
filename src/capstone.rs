@@ -95,7 +95,7 @@ fn to_res(code: cs_err) -> Result<(), CsErr> {
     }
 }
 
-/// Disassebled instruction.
+/// Disassembled instruction.
 ///
 /// A Rust-friendly struct to access fields of a disassembled instruction. This is a safe wrapper
 /// over cs_insn.
@@ -227,7 +227,7 @@ impl Instr {
 /// let dec = cs::Capstone::new(cs::cs_arch::CS_ARCH_X86, cs::cs_mode::CS_MODE_32).unwrap();
 ///
 /// let buf = dec.disasm(code.as_slice(), 0, 0).unwrap();
-/// let add = buf.get(0);
+/// let add = buf.get(0).unwrap();
 /// if let cs::InstrIdArch::X86(insn) = add.id {
 ///     assert_eq!(insn, cs::x86_insn::X86_INS_ADD);
 /// }
@@ -259,7 +259,7 @@ pub enum InstrIdArch {
 /// dec.option(cs::cs_opt_type::CS_OPT_DETAIL, cs::cs_opt_value::CS_OPT_ON).unwrap();
 ///
 /// let buf = dec.disasm(code.as_slice(), 0, 0).unwrap();
-/// let detail = buf.get(0).detail.unwrap(); // `buf` contains only one 'add'.
+/// let detail = buf.get(0).unwrap().detail.unwrap(); // `buf` contains only one 'add'.
 /// assert_eq!(dec.reg_name(detail.regs_write[0]), Some("eflags"));
 /// ```
 #[derive(Debug)]
@@ -321,12 +321,15 @@ impl InstrBuf {
     }
 
     /// Get the instruction at the requested index.
-    pub fn get(&self, index: usize) -> Instr {
-        assert!(index < self.count);
+    pub fn get(&self, index: usize) -> Option<Instr> {
+        if index >= self.count {
+            return None;
+        }
+
         let insn;
 
         unsafe { insn = &(*(self.ptr.offset(index as isize))) }
-        Instr::new(insn, self.decode_detail, self.arch)
+        Some(Instr::new(insn, self.decode_detail, self.arch))
     }
 
     /// Create an iterator from the beginning of this buffer.
@@ -347,15 +350,10 @@ impl<'a> Iterator for InstrIter<'a> {
     type Item = Instr;
 
     fn next(&mut self) -> Option<Self::Item> {
-        assert!(self.current <= self.buf.count());
+        let instr = self.buf.get(self.current);
+        self.current += 1;
 
-        if self.current == self.buf.count() {
-            None
-        } else {
-            let instr = self.buf.get(self.current);
-            self.current += 1;
-            Some(instr)
-        }
+        instr
     }
 }
 
@@ -454,9 +452,9 @@ impl Capstone {
     ///
     /// let dec = cs::Capstone::new(cs::cs_arch::CS_ARCH_X86, cs::cs_mode::CS_MODE_32).unwrap();
     /// let buf = dec.disasm(code.as_slice(), 0, 0).unwrap();
-    /// assert_eq!(buf.get(0).mnemonic, "push");
-    /// assert_eq!(buf.get(1).mnemonic, "dec");
-    /// assert_eq!(buf.get(2).mnemonic, "mov");
+    /// assert_eq!(buf.get(0).unwrap().mnemonic, "push");
+    /// assert_eq!(buf.get(1).unwrap().mnemonic, "dec");
+    /// assert_eq!(buf.get(2).unwrap().mnemonic, "mov");
     /// ```
     pub fn disasm(&self, buf: &[u8], addr: u64, count: usize) -> Result<InstrBuf, CsErr> {
         let mut insn: *mut cs_insn = 0 as *mut cs_insn;
