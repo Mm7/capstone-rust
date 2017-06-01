@@ -17,7 +17,7 @@ Append to Cargo.toml:
 
 ```
 [dependencies]
-capstone_rust = "0.2.1"
+capstone_rust = "0.2.2"
 ```
 
 Copy & paste an [example](https://github.com/Mm7/capstone-rust/tree/master/examples).

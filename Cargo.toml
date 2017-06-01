@@ -1,6 +1,6 @@
 [package]
 name = "capstone_rust"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["Marco Milanese <marcomilanese7@gmail.com>"]
 homepage = "https://github.com/Mm7/capstone-rust"
 repository = "https://github.com/Mm7/capstone-rust"
@@ -21,4 +21,4 @@ name = "capstone_rust"
 libc = "0.2"
 
 [build-dependencies]
-bindgen = "0.20.0"
+bindgen = "0.25.0"
