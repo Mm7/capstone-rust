@@ -2,11 +2,11 @@ extern crate libc;
 
 pub use capstone_sys::*;
 
-use std::cell::Cell;
 use std::error::Error;
 use std::ffi::CStr;
 use std::fmt;
 use std::mem::transmute;
+use std::sync::Mutex;
 
 /// Get the version of the capstone engine.
 ///
@@ -366,8 +366,8 @@ impl<'a> InstrIter<'a> {
 
 /// Capstone handle.
 pub struct Capstone {
-    handle: Cell<csh>,
-    details_on: Cell<bool>,
+    handle: csh,
+    details_on: Mutex<bool>,
     arch: cs_arch,
 }
 
@@ -375,7 +375,7 @@ impl Drop for Capstone {
     fn drop(&mut self) {
         let err;
 
-        unsafe { err = cs_close(self.handle.as_ptr()); }
+        unsafe { err = cs_close(&mut self.handle); }
 
         if err != cs_err::CS_ERR_OK {
             panic!("{}", CsErr::new(err).description())
@@ -394,7 +394,7 @@ impl Capstone {
         unsafe { err = cs_open(arch, mode, &mut handle) };
         to_res(err)?;
 
-        Ok(Capstone{handle: Cell::new(handle), details_on: Cell::new(false), arch: arch})
+        Ok(Capstone{handle: handle, details_on: Mutex::new(false), arch: arch})
     }
 
     /// Set option for disassembling engine at runtime.
@@ -405,7 +405,7 @@ impl Capstone {
 
         unsafe {
             let value = transmute::<cs_opt_value, u32>(value) as usize;
-            err = cs_option(self.handle.get(), typ, value);
+            err = cs_option(self.handle, typ, value);
         };
         to_res(err)?;
 
@@ -413,13 +413,13 @@ impl Capstone {
         // the `Details` struct must be created). Unfortunately Capstone doesn't provide a way to
         // get the value of an option, so we are forced to track the `DETAIL` option from here.
         if typ == cs_opt_type::CS_OPT_DETAIL {
-            self.details_on.set({
+            *self.details_on.lock().unwrap() = {
                 if value == cs_opt_value::CS_OPT_ON {
                     true
                 } else {
                     false
                 }
-            });
+            };
         }
 
         Ok(())
@@ -461,14 +461,14 @@ impl Capstone {
         let res;
 
         unsafe {
-            res = cs_disasm(self.handle.get(), buf.as_ptr(), buf.len(), addr, count, &mut insn);
+            res = cs_disasm(self.handle, buf.as_ptr(), buf.len(), addr, count, &mut insn);
         }
         if res == 0 {
-            let err = unsafe { cs_errno(self.handle.get()) };
+            let err = unsafe { cs_errno(self.handle) };
             return Err(CsErr::new(err));
         }
 
-        Ok(InstrBuf::new(insn, res, self.details_on.get(), self.arch))
+        Ok(InstrBuf::new(insn, res, *self.details_on.lock().unwrap(), self.arch))
     }
 
     /// Return friendly name of register in a string.
@@ -486,7 +486,7 @@ impl Capstone {
     /// ```
     pub fn reg_name(&self, reg_id: u32) -> Option<&str> {
         let name = unsafe {
-            let name = cs_reg_name(self.handle.get(), reg_id);
+            let name = cs_reg_name(self.handle, reg_id);
             if name == 0 as *const i8 {
                 return None;
             }
@@ -514,7 +514,7 @@ impl Capstone {
     /// ```
     pub fn group_name(&self, group_id: u32) -> Option<&str> {
         let name = unsafe {
-            let name = cs_group_name(self.handle.get(), group_id);
+            let name = cs_group_name(self.handle, group_id);
             if name == 0 as *const i8 {
                 return None;
             }
