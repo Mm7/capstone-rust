@@ -5,7 +5,7 @@ Rust bindings to Capstone engine.
 
 ### Dependencies
 
-Install clang-3.9 (needed by [bindgen](https://github.com/servo/rust-bindgenbindgen)) and Capstone
+Install clang-3.9 (needed by [bindgen](https://github.com/servo/rust-bindgen)) and Capstone
 
 ```
 sudo apt install llvm-3.9-dev libclang-3.9-dev clang-3.9 libcapstone3 libcapstone-dev
